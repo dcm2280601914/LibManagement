@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang chủ</title>
+</head>
+<body>
+<h1>Hệ thống quản lý thư viện</h1>
+
+<ul>
+    <li><a th:href="@{/books}">Quản lý sách</a></li>
+    <li><a th:href="@{/borrowers}">Quản lý người mượn</a></li>
+    <li><a th:href="@{/borrow-records}">Quản lý mượn sách</a></li>
+    <li><a th:href="@{/return-records}">Quản lý trả sách</a></li>
+    <li><a th:href="@{/employees}">Quản lý nhân viên</a></li>
+</ul>
+
+<form th:action="@{/logout}" method="post">
+    <button type="submit">Đăng xuất</button>
+</form>
+</body>
+</html>

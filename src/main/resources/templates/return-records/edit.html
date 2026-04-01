@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa phiếu trả</title>
+</head>
+<body>
+
+<h1>Sửa phiếu trả</h1>
+
+<form th:action="@{/return-records/update/{id}(id=${returnRecord.id})}" method="post">
+
+    <input type="hidden" name="borrowRecord.id" th:value="${returnRecord.borrowRecord.id}">
+
+    <div>
+        <label>Mã trả:</label>
+        <input type="text" name="returnCode" th:value="${returnRecord.returnCode}">
+    </div>
+
+    <div>
+        <label>Nhân viên:</label>
+        <select name="employee.id">
+            <option th:each="e : ${employees}"
+                    th:value="${e.id}"
+                    th:text="${e.fullName}"
+                    th:selected="${returnRecord.employee.id == e.id}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label>Ngày trả:</label>
+        <input type="date" name="returnDate" th:value="${returnRecord.returnDate}">
+    </div>
+
+    <div>
+        <label>Trạng thái:</label>
+        <select name="status">
+            <option th:each="s : ${statuses}"
+                    th:value="${s}"
+                    th:text="${s}"
+                    th:selected="${returnRecord.status == s}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label>Tiền phạt:</label>
+        <input type="number" name="fineAmount" th:value="${returnRecord.fineAmount}">
+    </div>
+
+    <button type="submit">Cập nhật</button>
+    <a th:href="@{/return-records}">Quay lại</a>
+
+</form>
+
+</body>
+</html>

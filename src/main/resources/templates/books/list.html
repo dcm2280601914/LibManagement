@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý sách</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #999;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        a, button {
+            margin-right: 5px;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .search-box {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Quản lý kho sách</h1>
+
+<div class="top-bar">
+    <div>
+        <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/books/add}">Thêm sách mới</a>
+    </div>
+</div>
+
+<div class="search-box">
+    <form th:action="@{/books}" method="get">
+        <input type="text" name="keyword" th:value="${keyword}" placeholder="Nhập tên sách cần tìm">
+        <button type="submit">Tìm kiếm</button>
+        <a th:href="@{/books}">Làm mới</a>
+    </form>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Tên sách</th>
+        <th>Tác giả</th>
+        <th>Năm XB</th>
+        <th>Số lượng</th>
+        <th>Còn lại</th>
+        <th>Chức năng</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.id}"></td>
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.author}"></td>
+        <td th:text="${book.publicationYear}"></td>
+        <td th:text="${book.totalQuantity}"></td>
+        <td th:text="${book.availableQuantity}"></td>
+        <td>
+            <a th:href="@{/books/detail/{id}(id=${book.id})}">Chi tiết</a>
+            <a th:href="@{/books/edit/{id}(id=${book.id})}">Sửa</a>
+            <a th:href="@{/books/delete/{id}(id=${book.id})}"
+               onclick="return confirm('Bạn có chắc muốn xóa sách này không?')">Xóa</a>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(books)}">
+        <td colspan="7">Không có dữ liệu sách</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

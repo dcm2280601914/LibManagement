@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm phiếu trả</title>
+    <style>
+        body { font-family: Arial; margin: 30px; }
+        form { width: 550px; }
+        div { margin-bottom: 10px; }
+        input, select { width: 100%; padding: 8px; }
+    </style>
+</head>
+<body>
+
+<h1>Thêm phiếu trả</h1>
+
+<form th:action="@{/return-records/save}" method="post">
+
+    <div>
+        <label>Mã trả:</label>
+        <input type="text" name="returnCode" required>
+    </div>
+
+    <div>
+        <label>Phiếu mượn:</label>
+        <select name="borrowRecord.id" required>
+            <option value="">-- Chọn phiếu mượn --</option>
+            <option th:each="b : ${borrowRecords}"
+                    th:value="${b.id}"
+                    th:text="${b.borrowCode + ' - ' + b.borrower.fullName}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label>Nhân viên:</label>
+        <select name="employee.id" required>
+            <option th:each="e : ${employees}"
+                    th:value="${e.id}"
+                    th:text="${e.fullName}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label>Ngày trả:</label>
+        <input type="date" name="returnDate" required>
+    </div>
+
+    <div>
+        <label>Trạng thái:</label>
+        <select name="status">
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"></option>
+        </select>
+    </div>
+
+    <div>
+        <label>Tiền phạt:</label>
+        <input type="number" name="fineAmount" value="0">
+    </div>
+
+    <button type="submit">Lưu</button>
+    <a th:href="@{/return-records}">Quay lại</a>
+
+</form>
+
+</body>
+</html>

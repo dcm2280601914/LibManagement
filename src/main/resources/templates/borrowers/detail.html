@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết người mượn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        .box {
+            width: 600px;
+            border: 1px solid #999;
+            padding: 20px;
+        }
+        p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Chi tiết người mượn</h1>
+
+<div class="box">
+    <p><strong>ID:</strong> <span th:text="${borrower.id}"></span></p>
+    <p><strong>Họ tên:</strong> <span th:text="${borrower.fullName}"></span></p>
+    <p><strong>Số điện thoại:</strong> <span th:text="${borrower.phone}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${borrower.email}"></span></p>
+    <p><strong>Địa chỉ:</strong> <span th:text="${borrower.address}"></span></p>
+    <p><strong>Số định danh:</strong> <span th:text="${borrower.identityNumber}"></span></p>
+</div>
+
+<br>
+<a th:href="@{/borrowers}">Quay lại danh sách</a>
+<a th:href="@{/borrowers/edit/{id}(id=${borrower.id})}">Sửa</a>
+
+</body>
+</html>

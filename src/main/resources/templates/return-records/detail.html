@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết phiếu trả</title>
+</head>
+<body>
+
+<h1>Chi tiết phiếu trả</h1>
+
+<p>Mã: <span th:text="${returnRecord.returnCode}"></span></p>
+<p>Người mượn: <span th:text="${returnRecord.borrowRecord.borrower.fullName}"></span></p>
+<p>Sách: <span th:text="${returnRecord.borrowRecord.book.title}"></span></p>
+<p>Ngày trả: <span th:text="${returnRecord.returnDate}"></span></p>
+<p>Trạng thái: <span th:text="${returnRecord.status}"></span></p>
+<p>Phạt: <span th:text="${returnRecord.fineAmount}"></span></p>
+
+<a th:href="@{/return-records}">Quay lại</a>
+
+</body>
+</html>

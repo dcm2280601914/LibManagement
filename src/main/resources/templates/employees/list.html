@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý nhân viên</title>
+    <style>
+        body { font-family: Arial; margin: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid #999; }
+        th, td { padding: 10px; }
+        a { margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+<h1>Quản lý nhân viên</h1>
+
+<div>
+    <a th:href="@{/}">Trang chủ</a>
+    <a th:href="@{/employees/add}">Thêm nhân viên</a>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Họ tên</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Role</th>
+        <th>Trạng thái</th>
+        <th>Chức năng</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="emp : ${employees}">
+        <td th:text="${emp.id}"></td>
+        <td th:text="${emp.fullName}"></td>
+        <td th:text="${emp.username}"></td>
+        <td th:text="${emp.email}"></td>
+        <td th:text="${emp.phone}"></td>
+        <td th:text="${emp.role}"></td>
+        <td th:text="${emp.active ? 'Hoạt động' : 'Khóa'}"></td>
+
+        <td>
+            <a th:href="@{/employees/detail/{id}(id=${emp.id})}">Chi tiết</a>
+            <a th:href="@{/employees/edit/{id}(id=${emp.id})}">Sửa</a>
+            <a th:href="@{/employees/delete/{id}(id=${emp.id})}"
+               onclick="return confirm('Xóa nhân viên này?')">Xóa</a>
+        </td>
+    </tr>
+
+    <tr th:if="${#lists.isEmpty(employees)}">
+        <td colspan="8">Không có dữ liệu</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý trả sách</title>
+    <style>
+        body { font-family: Arial; margin: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid #999; }
+        th, td { padding: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>Quản lý trả sách</h1>
+
+<a th:href="@{/}">Trang chủ</a>
+<a th:href="@{/return-records/add}">Thêm phiếu trả</a>
+
+<form th:action="@{/return-records}" method="get">
+    <input type="text" name="keyword" placeholder="Tìm theo người mượn">
+    <button type="submit">Tìm</button>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>Mã trả</th>
+        <th>Người mượn</th>
+        <th>Sách</th>
+        <th>Ngày trả</th>
+        <th>Trạng thái</th>
+        <th>Phạt</th>
+        <th>Chức năng</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="r : ${returnRecords}">
+        <td th:text="${r.returnCode}"></td>
+        <td th:text="${r.borrowRecord.borrower.fullName}"></td>
+        <td th:text="${r.borrowRecord.book.title}"></td>
+        <td th:text="${r.returnDate}"></td>
+        <td th:text="${r.status}"></td>
+        <td th:text="${r.fineAmount}"></td>
+
+        <td>
+            <a th:href="@{/return-records/detail/{id}(id=${r.id})}">Chi tiết</a>
+            <a th:href="@{/return-records/edit/{id}(id=${r.id})}">Sửa</a>
+            <a th:href="@{/return-records/delete/{id}(id=${r.id})}"
+               onclick="return confirm('Xóa phiếu trả?')">Xóa</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

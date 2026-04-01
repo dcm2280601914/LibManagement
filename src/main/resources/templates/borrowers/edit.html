@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa người mượn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        form {
+            width: 500px;
+        }
+        div {
+            margin-bottom: 12px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Sửa thông tin người mượn</h1>
+
+<form th:action="@{/borrowers/update/{id}(id=${borrower.id})}" th:object="${borrower}" method="post">
+    <div>
+        <label>Họ tên:</label>
+        <input type="text" th:field="*{fullName}" required>
+    </div>
+
+    <div>
+        <label>Số điện thoại:</label>
+        <input type="text" th:field="*{phone}" required>
+    </div>
+
+    <div>
+        <label>Email:</label>
+        <input type="email" th:field="*{email}">
+    </div>
+
+    <div>
+        <label>Địa chỉ:</label>
+        <input type="text" th:field="*{address}">
+    </div>
+
+    <div>
+        <label>Số định danh:</label>
+        <input type="text" th:field="*{identityNumber}">
+    </div>
+
+    <button type="submit">Cập nhật</button>
+    <a th:href="@{/borrowers}">Quay lại</a>
+</form>
+
+</body>
+</html>

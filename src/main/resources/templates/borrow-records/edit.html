@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sửa phiếu mượn</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        form { width: 550px; }
+        div { margin-bottom: 12px; }
+        input, select, textarea { width: 100%; padding: 8px; }
+    </style>
+</head>
+<body>
+
+<h1>Sửa phiếu mượn</h1>
+
+<form th:action="@{/borrow-records/update/{id}(id=${borrowRecord.id})}" method="post">
+
+    <div>
+        <label>Mã mượn:</label>
+        <input type="text" name="borrowCode" th:value="${borrowRecord.borrowCode}" required>
+    </div>
+
+    <div>
+        <label>Người mượn:</label>
+        <select name="borrower.id" required>
+            <option value="">-- Chọn người mượn --</option>
+            <option th:each="b : ${borrowers}"
+                    th:value="${b.id}"
+                    th:text="${b.fullName}"
+                    th:selected="${borrowRecord.borrower != null and borrowRecord.borrower.id == b.id}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label>Nhân viên ghi nhận:</label>
+        <select name="employee.id" required>
+            <option value="">-- Chọn nhân viên --</option>
+            <option th:each="e : ${employees}"
+                    th:value="${e.id}"
+                    th:text="${e.fullName}"
+                    th:selected="${borrowRecord.employee != null and borrowRecord.employee.id == e.id}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label>Sách:</label>
+        <select name="book.id" required>
+            <option value="">-- Chọn sách --</option>
+            <option th:each="book : ${books}"
+                    th:value="${book.id}"
+                    th:text="${book.title}"
+                    th:selected="${borrowRecord.book != null and borrowRecord.book.id == book.id}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label>Ngày mượn:</label>
+        <input type="date" name="borrowDate" th:value="${borrowRecord.borrowDate}" required>
+    </div>
+
+    <div>
+        <label>Hạn trả:</label>
+        <input type="date" name="dueDate" th:value="${borrowRecord.dueDate}" required>
+    </div>
+
+    <div>
+        <label>Trạng thái:</label>
+        <select name="status" required>
+            <option th:each="s : ${statuses}"
+                    th:value="${s}"
+                    th:text="${s}"
+                    th:selected="${borrowRecord.status == s}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label>Ghi chú:</label>
+        <textarea name="note" rows="4" th:text="${borrowRecord.note}"></textarea>
+    </div>
+
+    <button type="submit">Cập nhật</button>
+    <a th:href="@{/borrow-records}">Quay lại</a>
+</form>
+
+</body>
+</html>
