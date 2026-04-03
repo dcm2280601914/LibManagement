@@ -1,8 +1,8 @@
 package com.example.libmanagement.enums;
 
 public enum ReturnStatus {
-    ON_TIME,       // trả đúng hạn
-    LATE,          // trả trễ
-    DAMAGED,       // sách hư hỏng
-    LOST           // mất sách
+    RETURNED,   // Trả bình thường
+    LATE,       // Trả trễ
+    DAMAGED,    // Sách hư hỏng
+    LOST        // Mất sách
 }

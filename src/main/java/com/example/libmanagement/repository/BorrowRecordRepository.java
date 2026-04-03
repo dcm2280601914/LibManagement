@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Long> {
-    Optional<BorrowRecord> findByBorrowCode(String borrowCode);
+
+    List<BorrowRecord> findByBorrowerIdOrderByBorrowDateDesc(Long borrowerId);
+
     List<BorrowRecord> findByBorrowerFullNameContainingIgnoreCase(String keyword);
+
+    Optional<BorrowRecord> findByBorrowCode(String borrowCode);
 }

@@ -2,6 +2,7 @@ package com.example.libmanagement.entity;
 
 import com.example.libmanagement.enums.Role;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -54,6 +55,11 @@ public class Employee {
 
     public Long getId() {
         return id;
+    }
+
+    // THÊM DÒNG NÀY
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFullName() {
@@ -114,5 +120,9 @@ public class Employee {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

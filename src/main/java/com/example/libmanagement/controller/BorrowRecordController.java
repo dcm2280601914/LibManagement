@@ -1,6 +1,9 @@
 package com.example.libmanagement.controller;
 
+import com.example.libmanagement.entity.Book;
 import com.example.libmanagement.entity.BorrowRecord;
+import com.example.libmanagement.entity.Borrower;
+import com.example.libmanagement.entity.Employee;
 import com.example.libmanagement.enums.BorrowStatus;
 import com.example.libmanagement.service.BookService;
 import com.example.libmanagement.service.BorrowRecordService;
@@ -9,6 +12,7 @@ import com.example.libmanagement.service.EmployeeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +51,12 @@ public class BorrowRecordController {
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
-        model.addAttribute("borrowRecord", new BorrowRecord());
+        BorrowRecord borrowRecord = new BorrowRecord();
+        borrowRecord.setBorrower(new Borrower());
+        borrowRecord.setEmployee(new Employee());
+        borrowRecord.setBook(new Book());
+
+        model.addAttribute("borrowRecord", borrowRecord);
         model.addAttribute("borrowers", borrowerService.findAll());
         model.addAttribute("employees", employeeService.findAll());
         model.addAttribute("books", bookService.findAll());
@@ -56,9 +65,32 @@ public class BorrowRecordController {
     }
 
     @PostMapping("/save")
-    public String saveBorrowRecord(@ModelAttribute("borrowRecord") BorrowRecord borrowRecord) {
-        borrowRecordService.save(borrowRecord);
-        return "redirect:/borrow-records";
+    public String saveBorrowRecord(@ModelAttribute("borrowRecord") BorrowRecord borrowRecord,
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            borrowRecordService.save(borrowRecord);
+            redirectAttributes.addFlashAttribute("successMessage", "Lập phiếu mượn thành công.");
+            return "redirect:/borrow-records";
+        } catch (RuntimeException e) {
+            if (borrowRecord.getBorrower() == null) {
+                borrowRecord.setBorrower(new Borrower());
+            }
+            if (borrowRecord.getEmployee() == null) {
+                borrowRecord.setEmployee(new Employee());
+            }
+            if (borrowRecord.getBook() == null) {
+                borrowRecord.setBook(new Book());
+            }
+
+            model.addAttribute("borrowRecord", borrowRecord);
+            model.addAttribute("borrowers", borrowerService.findAll());
+            model.addAttribute("employees", employeeService.findAll());
+            model.addAttribute("books", bookService.findAll());
+            model.addAttribute("statuses", Arrays.asList(BorrowStatus.values()));
+            model.addAttribute("errorMessage", e.getMessage());
+            return "borrow-records/add";
+        }
     }
 
     @GetMapping("/edit/{id}")
@@ -76,9 +108,23 @@ public class BorrowRecordController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateBorrowRecord(@PathVariable Long id, @ModelAttribute("borrowRecord") BorrowRecord borrowRecord) {
-        borrowRecordService.update(id, borrowRecord);
-        return "redirect:/borrow-records";
+    public String updateBorrowRecord(@PathVariable Long id,
+                                     @ModelAttribute("borrowRecord") BorrowRecord borrowRecord,
+                                     Model model,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            borrowRecordService.update(id, borrowRecord);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật phiếu mượn thành công.");
+            return "redirect:/borrow-records";
+        } catch (RuntimeException e) {
+            model.addAttribute("borrowRecord", borrowRecord);
+            model.addAttribute("borrowers", borrowerService.findAll());
+            model.addAttribute("employees", employeeService.findAll());
+            model.addAttribute("books", bookService.findAll());
+            model.addAttribute("statuses", Arrays.asList(BorrowStatus.values()));
+            model.addAttribute("errorMessage", e.getMessage());
+            return "borrow-records/edit";
+        }
     }
 
     @GetMapping("/detail/{id}")

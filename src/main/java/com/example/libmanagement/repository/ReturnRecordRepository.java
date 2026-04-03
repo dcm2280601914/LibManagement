@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReturnRecordRepository extends JpaRepository<ReturnRecord, Long> {
+
+    Optional<ReturnRecord> findByBorrowRecordId(Long borrowRecordId);
+
+    boolean existsByBorrowRecordId(Long borrowRecordId);
+
     Optional<ReturnRecord> findByReturnCode(String returnCode);
+
     List<ReturnRecord> findByBorrowRecordBorrowerFullNameContainingIgnoreCase(String keyword);
 }

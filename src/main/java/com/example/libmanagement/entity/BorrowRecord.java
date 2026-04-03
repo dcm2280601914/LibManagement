@@ -16,15 +16,15 @@ public class BorrowRecord {
     @Column(name = "borrow_code", nullable = false, unique = true, length = 30)
     private String borrowCode;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "borrower_id", nullable = false)
     private Borrower borrower;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
@@ -54,6 +54,21 @@ public class BorrowRecord {
         this.dueDate = dueDate;
         this.status = status;
         this.note = note;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (borrowDate == null) {
+            borrowDate = LocalDate.now();
+        }
+        if (status == null) {
+            status = BorrowStatus.BORROWED;
+        }
+    }
+
+    @Transient
+    public boolean isOverdue() {
+        return dueDate != null && LocalDate.now().isAfter(dueDate);
     }
 
     public Long getId() {

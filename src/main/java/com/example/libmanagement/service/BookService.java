@@ -1,6 +1,7 @@
 package com.example.libmanagement.service;
 
 import com.example.libmanagement.entity.Book;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -10,5 +11,16 @@ public interface BookService {
     Book save(Book book);
     Book update(Long id, Book book);
     void delete(Long id);
-    List<Book> searchByTitle(String keyword);
+
+    Page<Book> searchBooks(String keyword,
+                           Long categoryId,
+                           String author,
+                           Integer publicationYear,
+                           int page,
+                           int size,
+                           String sortField,
+                           String sortDir);
+
+    List<String> getAllAuthors();
+    List<Integer> getAllPublicationYears();
 }

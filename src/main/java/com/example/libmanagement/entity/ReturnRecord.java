@@ -17,11 +17,11 @@ public class ReturnRecord {
     @Column(name = "return_code", nullable = false, unique = true, length = 30)
     private String returnCode;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "borrow_record_id", nullable = false, unique = true)
     private BorrowRecord borrowRecord;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
@@ -50,6 +50,19 @@ public class ReturnRecord {
         this.status = status;
         this.fineAmount = fineAmount;
         this.note = note;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (returnDate == null) {
+            returnDate = LocalDate.now();
+        }
+        if (fineAmount == null) {
+            fineAmount = BigDecimal.ZERO;
+        }
+        if (status == null) {
+            status = ReturnStatus.RETURNED;
+        }
     }
 
     public Long getId() {
