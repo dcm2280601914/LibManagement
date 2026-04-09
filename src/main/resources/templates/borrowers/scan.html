@@ -9,248 +9,391 @@
     <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css}" rel="stylesheet">
 
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #eff6ff;
+            --success-soft: #ecfdf3;
+            --danger-soft: #fef2f2;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+        }
+
         body {
-            background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+            background: linear-gradient(180deg, #f8fbff 0%, #f8fafc 100%);
+            color: var(--text-main);
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
         }
 
-        .scan-header {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            border-radius: 22px;
-            padding: 28px;
-            box-shadow: 0 14px 35px rgba(37, 99, 235, 0.22);
+        .page-wrapper {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
         }
 
-        .scan-card {
+        .hero-card {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #3b82f6 100%);
             border: none;
-            border-radius: 22px;
-            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+            border-radius: 24px;
+            color: white;
+            box-shadow: 0 18px 45px rgba(37, 99, 235, 0.18);
             overflow: hidden;
+            position: relative;
         }
 
-        .scan-card .card-body {
-            padding: 28px;
-        }
-
-        .scan-box {
-            background: #f8fafc;
-            border: 2px dashed #bfdbfe;
-            border-radius: 18px;
-            padding: 28px;
-            text-align: center;
-            transition: all 0.25s ease;
-        }
-
-        .scan-box:hover {
-            background: #eff6ff;
-            border-color: #60a5fa;
-        }
-
-        .scan-icon {
-            width: 86px;
-            height: 86px;
-            margin: 0 auto 16px;
+        .hero-card::before {
+            content: "";
+            position: absolute;
+            right: 60px;
+            bottom: -40px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-            color: #1d4ed8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
+            background: rgba(255,255,255,0.08);
         }
 
-        .scan-title {
-            font-size: 1.15rem;
+        .hero-card::after {
+            content: "";
+            position: absolute;
+            right: -70px;
+            top: -70px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
             font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 6px;
+            letter-spacing: -0.02em;
         }
 
-        .scan-subtitle {
-            color: #64748b;
+        .hero-subtitle {
+            color: rgba(255,255,255,0.88);
+            max-width: 760px;
+            font-size: 1.02rem;
+            line-height: 1.6;
             margin-bottom: 0;
         }
 
-        .form-label {
+        .soft-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            border-radius: 22px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        .scan-card {
+            background: linear-gradient(135deg, #eff6ff, #ffffff);
+            border: 1px solid #dbeafe;
+            border-radius: 18px;
+            padding: 20px;
+        }
+
+        .scan-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+            color: #1d4ed8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 1.08rem;
             font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 8px;
+            margin-bottom: 0.25rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.45rem;
         }
 
         .form-control {
+            min-height: 52px;
             border-radius: 14px;
-            padding: 14px 16px;
-            border: 1px solid #cbd5e1;
+            border-color: #dbe2ea;
+            box-shadow: none !important;
             font-size: 1rem;
         }
 
         .form-control:focus {
-            border-color: #60a5fa;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.12) !important;
+        }
+
+        .search-input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid #dbe2ea;
+            border-radius: 14px;
+            background: #fff;
+            min-height: 52px;
+            padding: 0 14px;
+        }
+
+        .search-input-group:focus-within {
+            border-color: #93c5fd;
             box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.12);
         }
 
-        .btn-soft {
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-weight: 600;
+        .search-input-group i {
+            color: var(--primary-color);
+            font-size: 1.05rem;
+            margin-right: 10px;
         }
 
-        .btn-primary-custom {
-            border-radius: 14px;
-            padding: 12px 18px;
+        .search-input-group input {
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            min-height: 46px;
+            padding-left: 0;
+            width: 100%;
+        }
+
+        .helper-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .helper-box-title {
             font-weight: 700;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            margin-bottom: 6px;
+        }
+
+        .helper-list {
+            color: var(--text-muted);
+            margin-bottom: 0;
+            padding-left: 1rem;
+        }
+
+        .btn {
+            border-radius: 14px;
+            font-weight: 600;
+            padding: 0.72rem 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             border: none;
         }
 
-        .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        .btn-light-soft {
+            background: #fff;
+            color: #0f172a;
+            border: 1px solid rgba(255,255,255,0.45);
         }
 
-        .hint-list {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 18px;
+        .btn-light-soft:hover {
+            background: rgba(255,255,255,0.94);
+            color: #0f172a;
         }
 
-        .hint-item {
-            display: flex;
-            gap: 10px;
-            align-items: flex-start;
-            color: #475569;
-            margin-bottom: 10px;
+        .alert {
+            border-radius: 16px;
+            border: none;
         }
 
-        .hint-item:last-child {
-            margin-bottom: 0;
+        .preview-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
         }
 
-        .hint-item i {
-            color: #2563eb;
-            margin-top: 2px;
+        .preview-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 6px;
         }
 
-        @media (max-width: 768px) {
-            .scan-header,
-            .scan-card .card-body {
-                padding: 20px;
+        .preview-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            word-break: break-word;
+        }
+
+        .sticky-side {
+            position: sticky;
+            top: 24px;
+        }
+
+        @media (min-width: 1400px) {
+            .container-fluid.custom-page {
+                padding-left: 40px !important;
+                padding-right: 40px !important;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .hero-actions {
+                width: 100%;
+                margin-top: 1rem;
             }
 
-            .scan-box {
-                padding: 22px 16px;
+            .hero-actions .btn {
+                width: 100%;
+            }
+
+            .sticky-side {
+                position: static;
             }
         }
     </style>
 </head>
 <body>
-<div class="container py-4 py-md-5">
+<div class="container-fluid custom-page py-4 py-lg-4 px-3 px-lg-4 px-xxl-5">
+    <div class="page-wrapper">
 
-    <!-- HEADER -->
-    <div class="scan-header mb-4">
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-            <div>
-                <h2 class="mb-1"><i class="bi bi-upc-scan me-2"></i>Quét QR / Barcode người mượn</h2>
-                <p class="mb-0 opacity-75">
-                    Tra cứu nhanh người mượn bằng máy quét mã hoặc nhập thủ công mã nhận diện.
-                </p>
-            </div>
-            <div>
-                <a th:href="@{/borrowers}" class="btn btn-light btn-soft">
-                    <i class="bi bi-arrow-left-circle me-1"></i>Quay lại danh sách
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- ALERT -->
-    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        <span th:text="${errorMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <span th:text="${successMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-
-    <div class="row g-4">
-        <!-- FORM -->
-        <div class="col-lg-8">
-            <div class="card scan-card">
-                <div class="card-body">
-                    <div class="scan-box mb-4">
-                        <div class="scan-icon">
-                            <i class="bi bi-qr-code-scan"></i>
+        <!-- HERO -->
+        <div class="card hero-card mb-4">
+            <div class="card-body p-4 p-lg-5 hero-content">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
+                    <div>
+                        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3"
+                             style="background: rgba(255,255,255,0.12); font-weight: 600;">
+                            <i class="bi bi-upc-scan"></i>
+                            Nhận diện người mượn
                         </div>
-                        <div class="scan-title">Sẵn sàng quét mã</div>
-                        <p class="scan-subtitle">
-                            Đặt con trỏ vào ô nhập bên dưới, sau đó dùng máy scanner hoặc nhập mã trực tiếp.
+
+                        <h1 class="hero-title h2 mb-2">Quét QR / Barcode người mượn</h1>
+                        <p class="hero-subtitle">
+                            Đặt con trỏ vào ô nhập rồi quét bằng máy scanner hoặc nhập mã thủ công
+                            để tìm nhanh hồ sơ người mượn trong hệ thống.
                         </p>
                     </div>
 
-                    <form th:action="@{/borrowers/scan}" method="post">
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-upc me-1"></i>Mã QR / Barcode
-                            </label>
-                            <input type="text"
-                                   name="qrCode"
-                                   class="form-control"
-                                   placeholder="Ví dụ: BR001245 hoặc quét trực tiếp tại đây"
-                                   autofocus
-                                   autocomplete="off"
-                                   required>
-                        </div>
-
-                        <div class="d-flex flex-wrap gap-2">
-                            <button type="submit" class="btn btn-primary-custom">
-                                <i class="bi bi-search me-1"></i>Tìm người mượn
-                            </button>
-                            <button type="reset" class="btn btn-outline-secondary btn-soft">
-                                <i class="bi bi-arrow-clockwise me-1"></i>Xóa nhanh
-                            </button>
-                        </div>
-                    </form>
+                    <div class="hero-actions d-flex flex-wrap gap-2">
+                        <a th:href="@{/borrowers}" class="btn btn-light-soft">
+                            <i class="bi bi-arrow-left-circle me-1"></i> Quay lại danh sách
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- GUIDE -->
-        <div class="col-lg-4">
-            <div class="hint-list h-100">
-                <h5 class="fw-bold mb-3">
-                    <i class="bi bi-lightbulb me-2 text-primary"></i>Hướng dẫn nhanh
-                </h5>
+        <!-- ALERT -->
+        <div th:if="${errorMessage}" class="alert alert-danger shadow-sm mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
 
-                <div class="hint-item">
-                    <i class="bi bi-1-circle-fill"></i>
-                    <div>Nhấp vào ô nhập để con trỏ luôn sẵn sàng nhận dữ liệu từ máy quét.</div>
+        <div th:if="${successMessage}" class="alert alert-success shadow-sm mb-4">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <!-- MAIN -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card soft-card h-100">
+                    <div class="card-body p-4 p-lg-4">
+                        <div class="mb-4">
+                            <h2 class="section-title mb-1">Nhập mã QR / Barcode</h2>
+                            <div class="section-subtitle">
+                                Hệ thống sẽ tìm người mượn tương ứng dựa trên mã được quét hoặc nhập vào
+                            </div>
+                        </div>
+
+                        <form th:action="@{/borrowers/scan}" method="post">
+                            <div class="scan-card mb-4">
+                                <div class="scan-icon">
+                                    <i class="bi bi-qr-code-scan"></i>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Mã QR / Barcode</label>
+                                    <div class="search-input-group">
+                                        <i class="bi bi-upc-scan"></i>
+                                        <input type="text"
+                                               name="qrCode"
+                                               id="qrCodeInput"
+                                               class="form-control"
+                                               placeholder="Quét mã hoặc nhập mã QR/Barcode tại đây"
+                                               autofocus
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-search me-1"></i> Tìm người mượn
+                                    </button>
+                                    <a th:href="@{/borrowers}" class="btn btn-outline-secondary">
+                                        Hủy
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="helper-box">
+                            <div class="helper-box-title">
+                                <i class="bi bi-lightbulb me-1"></i> Gợi ý sử dụng
+                            </div>
+                            <ul class="helper-list">
+                                <li>Đặt con trỏ chuột vào ô nhập trước khi quét bằng máy scanner.</li>
+                                <li>Có thể nhập mã thủ công nếu thiết bị quét không hoạt động.</li>
+                                <li>Nên kiểm tra đúng định dạng mã đã cấp cho người mượn.</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="hint-item">
-                    <i class="bi bi-2-circle-fill"></i>
-                    <div>Khi máy scanner quét xong, mã thường sẽ tự điền và gửi rất nhanh.</div>
-                </div>
+            <div class="col-lg-4">
+                <div class="sticky-side">
+                    <div class="preview-box">
+                        <div class="section-title mb-1">Xem trước dữ liệu quét</div>
+                        <div class="section-subtitle mb-3">
+                            Mã vừa nhập sẽ hiển thị tại đây trước khi gửi tìm kiếm
+                        </div>
 
-                <div class="hint-item">
-                    <i class="bi bi-3-circle-fill"></i>
-                    <div>Nếu không có máy quét, bạn có thể nhập mã QR hoặc Barcode thủ công.</div>
-                </div>
-
-                <div class="hint-item">
-                    <i class="bi bi-4-circle-fill"></i>
-                    <div>Nếu không tìm thấy dữ liệu, hãy kiểm tra lại mã thẻ hoặc QR đã được lưu đúng chưa.</div>
+                        <div class="preview-label">Mã hiện tại</div>
+                        <div class="preview-value" id="previewQrCode">Chưa nhập mã</div>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
-
 </div>
 
-<script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js}"></script>
+<script>
+    const qrCodeInput = document.getElementById('qrCodeInput');
+    const previewQrCode = document.getElementById('previewQrCode');
+
+    function updatePreview() {
+        const value = qrCodeInput.value.trim();
+        previewQrCode.textContent = value || 'Chưa nhập mã';
+    }
+
+    qrCodeInput.addEventListener('input', updatePreview);
+    updatePreview();
+</script>
 </body>
 </html>

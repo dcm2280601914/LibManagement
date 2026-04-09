@@ -4,9 +4,13 @@ import com.example.libmanagement.entity.Book;
 import com.example.libmanagement.entity.Category;
 import com.example.libmanagement.repository.BookRepository;
 import com.example.libmanagement.repository.CategoryRepository;
+import com.example.libmanagement.service.AuditLogService;
 import com.example.libmanagement.service.BookService;
 import com.example.libmanagement.specification.BookSpecification;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +22,14 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final AuditLogService auditLogService;
 
-    public BookServiceImpl(BookRepository bookRepository, CategoryRepository categoryRepository) {
+    public BookServiceImpl(BookRepository bookRepository,
+                           CategoryRepository categoryRepository,
+                           AuditLogService auditLogService) {
         this.bookRepository = bookRepository;
         this.categoryRepository = categoryRepository;
+        this.auditLogService = auditLogService;
     }
 
     @Override
@@ -43,7 +51,26 @@ public class BookServiceImpl implements BookService {
             book.setCategory(null);
         }
 
-        return bookRepository.save(book);
+        if (book.getBarcode() != null && !book.getBarcode().trim().isEmpty()) {
+            String barcode = book.getBarcode().trim();
+            boolean exists = bookRepository.existsByBarcode(barcode);
+            if (exists) {
+                throw new RuntimeException("Mã barcode đã tồn tại: " + barcode);
+            }
+            book.setBarcode(barcode);
+        }
+
+        Book savedBook = bookRepository.save(book);
+
+        auditLogService.log(
+                "CREATE",
+                "BOOK",
+                "Book",
+                savedBook.getId(),
+                "Thêm sách: " + savedBook.getTitle()
+        );
+
+        return savedBook;
     }
 
     @Override
@@ -53,12 +80,22 @@ public class BookServiceImpl implements BookService {
             return null;
         }
 
+        if (book.getBarcode() != null && !book.getBarcode().trim().isEmpty()) {
+            String barcode = book.getBarcode().trim();
+            boolean exists = bookRepository.existsByBarcodeAndIdNot(barcode, id);
+            if (exists) {
+                throw new RuntimeException("Mã barcode đã tồn tại: " + barcode);
+            }
+            existingBook.setBarcode(barcode);
+        } else {
+            existingBook.setBarcode(book.getBarcode());
+        }
+
         existingBook.setTitle(book.getTitle());
         existingBook.setAuthor(book.getAuthor());
         existingBook.setPublisher(book.getPublisher());
         existingBook.setPublicationYear(book.getPublicationYear());
         existingBook.setIsbn(book.getIsbn());
-        existingBook.setBarcode(book.getBarcode());
         existingBook.setLocation(book.getLocation());
         existingBook.setCoverImage(book.getCoverImage());
         existingBook.setImportDate(book.getImportDate());
@@ -73,12 +110,38 @@ public class BookServiceImpl implements BookService {
             existingBook.setCategory(null);
         }
 
-        return bookRepository.save(existingBook);
+        Book updatedBook = bookRepository.save(existingBook);
+
+        auditLogService.log(
+                "UPDATE",
+                "BOOK",
+                "Book",
+                updatedBook.getId(),
+                "Cập nhật sách: " + updatedBook.getTitle()
+        );
+
+        return updatedBook;
     }
 
     @Override
     public void delete(Long id) {
-        bookRepository.deleteById(id);
+        Book existingBook = findById(id);
+        if (existingBook == null) {
+            return;
+        }
+
+        String bookTitle = existingBook.getTitle();
+        Long bookId = existingBook.getId();
+
+        bookRepository.delete(existingBook);
+
+        auditLogService.log(
+                "DELETE",
+                "BOOK",
+                "Book",
+                bookId,
+                "Xóa sách: " + bookTitle
+        );
     }
 
     @Override

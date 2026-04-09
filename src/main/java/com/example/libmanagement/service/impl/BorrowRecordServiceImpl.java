@@ -72,6 +72,13 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             throw new RuntimeException("Người mượn hiện không được phép mượn sách");
         }
 
+        Integer currentBorrowedCount = borrower.getCurrentBorrowedCount() == null ? 0 : borrower.getCurrentBorrowedCount();
+        Integer maxBorrowLimit = borrower.getMaxBorrowLimit() == null ? 0 : borrower.getMaxBorrowLimit();
+
+        if (currentBorrowedCount >= maxBorrowLimit) {
+            throw new RuntimeException("Người mượn đã đạt giới hạn mượn sách");
+        }
+
         if (book.getAvailableQuantity() == null || book.getAvailableQuantity() <= 0) {
             throw new RuntimeException("Sách đã hết trong kho");
         }
@@ -92,7 +99,6 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             throw new RuntimeException("Hạn trả phải sau hoặc bằng ngày mượn");
         }
 
-        // Phiếu mượn mới luôn là BORROWED
         borrowRecord.setStatus(BorrowStatus.BORROWED);
 
         if (!StringUtils.hasText(borrowRecord.getBorrowCode())) {
@@ -106,9 +112,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         }
 
         book.setAvailableQuantity(book.getAvailableQuantity() - 1);
-        borrower.setCurrentBorrowedCount(
-                (borrower.getCurrentBorrowedCount() == null ? 0 : borrower.getCurrentBorrowedCount()) + 1
-        );
+        borrower.setCurrentBorrowedCount(currentBorrowedCount + 1);
 
         bookRepository.save(book);
         borrowerRepository.save(borrower);
@@ -133,13 +137,17 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             throw new RuntimeException("Sách không hợp lệ");
         }
 
-        Borrower borrower = borrowerRepository.findById(borrowRecord.getBorrower().getId())
+        Borrower oldBorrower = existing.getBorrower();
+        Book oldBook = existing.getBook();
+        BorrowStatus oldStatus = existing.getStatus();
+
+        Borrower newBorrower = borrowerRepository.findById(borrowRecord.getBorrower().getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người mượn"));
 
         Employee employee = employeeRepository.findById(borrowRecord.getEmployee().getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên"));
 
-        Book book = bookRepository.findById(borrowRecord.getBook().getId())
+        Book newBook = bookRepository.findById(borrowRecord.getBook().getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sách"));
 
         if (borrowRecord.getDueDate() != null && borrowRecord.getBorrowDate() != null
@@ -155,12 +163,65 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             existing.setBorrowCode(borrowRecord.getBorrowCode().trim());
         }
 
-        existing.setBorrower(borrower);
+        BorrowStatus newStatus = borrowRecord.getStatus() == null ? BorrowStatus.BORROWED : borrowRecord.getStatus();
+
+        boolean oldWasBorrowed = oldStatus == BorrowStatus.BORROWED;
+        boolean newIsBorrowed = newStatus == BorrowStatus.BORROWED;
+
+        boolean borrowerChanged = oldBorrower != null && newBorrower != null && !oldBorrower.getId().equals(newBorrower.getId());
+        boolean bookChanged = oldBook != null && newBook != null && !oldBook.getId().equals(newBook.getId());
+
+        if ((borrowerChanged || bookChanged || oldWasBorrowed != newIsBorrowed) && newIsBorrowed) {
+            if (!newBorrower.isAllowedToBorrow()) {
+                throw new RuntimeException("Người mượn hiện không được phép mượn sách");
+            }
+
+            int newCurrent = newBorrower.getCurrentBorrowedCount() == null ? 0 : newBorrower.getCurrentBorrowedCount();
+            int newLimit = newBorrower.getMaxBorrowLimit() == null ? 0 : newBorrower.getMaxBorrowLimit();
+
+            if (borrowerChanged || !oldWasBorrowed) {
+                if (newCurrent >= newLimit) {
+                    throw new RuntimeException("Người mượn đã đạt giới hạn mượn sách");
+                }
+            }
+
+            if (bookChanged || !oldWasBorrowed) {
+                if (newBook.getAvailableQuantity() == null || newBook.getAvailableQuantity() <= 0) {
+                    throw new RuntimeException("Sách đã hết trong kho");
+                }
+            }
+        }
+
+        if (oldWasBorrowed) {
+            if (oldBook != null) {
+                int oldAvailable = oldBook.getAvailableQuantity() == null ? 0 : oldBook.getAvailableQuantity();
+                oldBook.setAvailableQuantity(oldAvailable + 1);
+                bookRepository.save(oldBook);
+            }
+
+            if (oldBorrower != null) {
+                int oldCurrent = oldBorrower.getCurrentBorrowedCount() == null ? 0 : oldBorrower.getCurrentBorrowedCount();
+                oldBorrower.setCurrentBorrowedCount(Math.max(oldCurrent - 1, 0));
+                borrowerRepository.save(oldBorrower);
+            }
+        }
+
+        if (newIsBorrowed) {
+            int newAvailable = newBook.getAvailableQuantity() == null ? 0 : newBook.getAvailableQuantity();
+            newBook.setAvailableQuantity(newAvailable - 1);
+            bookRepository.save(newBook);
+
+            int newCurrent = newBorrower.getCurrentBorrowedCount() == null ? 0 : newBorrower.getCurrentBorrowedCount();
+            newBorrower.setCurrentBorrowedCount(newCurrent + 1);
+            borrowerRepository.save(newBorrower);
+        }
+
+        existing.setBorrower(newBorrower);
         existing.setEmployee(employee);
-        existing.setBook(book);
+        existing.setBook(newBook);
         existing.setBorrowDate(borrowRecord.getBorrowDate());
         existing.setDueDate(borrowRecord.getDueDate());
-        existing.setStatus(borrowRecord.getStatus());
+        existing.setStatus(newStatus);
         existing.setNote(borrowRecord.getNote());
 
         return borrowRecordRepository.save(existing);
@@ -168,7 +229,29 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
 
     @Override
     public void delete(Long id) {
-        borrowRecordRepository.deleteById(id);
+        BorrowRecord existing = findById(id);
+        if (existing == null) {
+            return;
+        }
+
+        if (existing.getStatus() == BorrowStatus.BORROWED) {
+            Book book = existing.getBook();
+            Borrower borrower = existing.getBorrower();
+
+            if (book != null) {
+                int available = book.getAvailableQuantity() == null ? 0 : book.getAvailableQuantity();
+                book.setAvailableQuantity(available + 1);
+                bookRepository.save(book);
+            }
+
+            if (borrower != null) {
+                int current = borrower.getCurrentBorrowedCount() == null ? 0 : borrower.getCurrentBorrowedCount();
+                borrower.setCurrentBorrowedCount(Math.max(current - 1, 0));
+                borrowerRepository.save(borrower);
+            }
+        }
+
+        borrowRecordRepository.delete(existing);
     }
 
     @Override

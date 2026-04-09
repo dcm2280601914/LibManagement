@@ -2,7 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Thêm người mượn</title>
+    <title>Cập nhật người mượn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css}" rel="stylesheet">
@@ -156,15 +156,15 @@
         }
 
         .avatar-preview {
-            width: 70px;
-            height: 70px;
+            width: 72px;
+            height: 72px;
             border-radius: 18px;
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.65rem;
+            font-size: 1.75rem;
             font-weight: 700;
             box-shadow: 0 12px 24px rgba(37, 99, 235, 0.20);
         }
@@ -226,19 +226,22 @@
                     <div>
                         <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3"
                              style="background: rgba(255,255,255,0.12); font-weight: 600;">
-                            <i class="bi bi-person-plus-fill"></i>
-                            Hồ sơ thành viên mới
+                            <i class="bi bi-pencil-square"></i>
+                            Chỉnh sửa hồ sơ thành viên
                         </div>
-                        <h1 class="hero-title h2 mb-2">Thêm người mượn</h1>
+                        <h1 class="hero-title h2 mb-2">Cập nhật người mượn</h1>
                         <p class="hero-subtitle mb-0">
-                            Tạo hồ sơ người mượn mới, thiết lập trạng thái, hạng thành viên
-                            và thông tin nhận diện để sử dụng trong hệ thống thư viện.
+                            Chỉnh sửa thông tin cá nhân, trạng thái tài khoản, hạng thành viên
+                            và các chỉ số phục vụ quản lý người mượn trong thư viện.
                         </p>
                     </div>
 
                     <div class="hero-actions d-flex flex-wrap gap-2">
                         <a th:href="@{/borrowers}" class="btn btn-light-soft">
-                            <i class="bi bi-arrow-left-circle me-1"></i> Quay lại danh sách
+                            <i class="bi bi-arrow-left-circle me-1"></i> Quay lại
+                        </a>
+                        <a th:href="@{/borrowers/detail/{id}(id=${borrower.id})}" class="btn btn-light-soft">
+                            <i class="bi bi-eye me-1"></i> Xem chi tiết
                         </a>
                     </div>
                 </div>
@@ -250,17 +253,21 @@
             <span th:text="${errorMessage}"></span>
         </div>
 
-        <form th:action="@{/borrowers/save}" th:object="${borrower}" method="post">
+        <form th:action="@{/borrowers/update/{id}(id=${borrower.id})}"
+              th:object="${borrower}" method="post">
+
             <div class="row g-4">
                 <div class="col-lg-8">
                     <div class="card soft-card h-100">
                         <div class="card-body p-4 p-lg-4">
                             <div class="mb-4">
                                 <h2 class="section-title mb-1">Thông tin cơ bản</h2>
-                                <div class="section-subtitle">Nhập thông tin nhận dạng và liên hệ của người mượn</div>
+                                <div class="section-subtitle">Cập nhật thông tin nhận dạng và liên hệ của người mượn</div>
                             </div>
 
                             <div class="row g-3">
+                                <input type="hidden" th:field="*{id}">
+
                                 <div class="col-md-6">
                                     <label class="form-label">Họ tên *</label>
                                     <input type="text" class="form-control" th:field="*{fullName}" required>
@@ -308,12 +315,12 @@
                             <hr class="my-4">
 
                             <div class="mb-4">
-                                <h2 class="section-title mb-1">Cấu hình tài khoản</h2>
-                                <div class="section-subtitle">Thiết lập quyền mượn và trạng thái thành viên</div>
+                                <h2 class="section-title mb-1">Trạng thái và quyền mượn</h2>
+                                <div class="section-subtitle">Quản lý hạng thành viên, giới hạn mượn và chỉ số thống kê</div>
                             </div>
 
                             <div class="row g-3">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label class="form-label">Trạng thái</label>
                                     <select class="form-select" th:field="*{status}">
                                         <option th:each="s : ${statuses}"
@@ -324,7 +331,7 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label class="form-label">Hạng thành viên</label>
                                     <select class="form-select" th:field="*{membershipLevel}" id="membershipLevel">
                                         <option th:each="m : ${membershipLevels}"
@@ -337,17 +344,31 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label">Giới hạn mượn</label>
-                                    <input type="number" class="form-control" id="maxBorrowLimitPreview" readonly>
+                                    <input type="number" class="form-control" id="maxBorrowLimitPreview"
+                                           th:value="${borrower.maxBorrowLimit}" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Điểm uy tín</label>
+                                    <input type="number" class="form-control" th:field="*{reputationScore}">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Đang mượn</label>
+                                    <input type="number" class="form-control" th:field="*{currentBorrowedCount}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Số lần trả muộn</label>
+                                    <input type="number" class="form-control" th:field="*{lateReturnCount}">
                                 </div>
                             </div>
 
                             <div class="d-flex flex-wrap gap-2 mt-4">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-save me-1"></i> Lưu người mượn
+                                    <i class="bi bi-check-circle me-1"></i> Cập nhật người mượn
                                 </button>
-                                <a th:href="@{/borrowers}" class="btn btn-outline-secondary">
-                                    Hủy
-                                </a>
+                                <a th:href="@{/borrowers}" class="btn btn-outline-secondary">Hủy</a>
                             </div>
                         </div>
                     </div>
@@ -358,33 +379,47 @@
                         <div class="card soft-card">
                             <div class="card-body p-4">
                                 <div class="mb-4">
-                                    <h2 class="section-title mb-1">Xem trước hồ sơ</h2>
-                                    <div class="section-subtitle">Thông tin sẽ hiển thị như một hồ sơ người mượn</div>
+                                    <h2 class="section-title mb-1">Tóm tắt hồ sơ</h2>
+                                    <div class="section-subtitle">Thông tin nhanh của người mượn đang chỉnh sửa</div>
                                 </div>
 
                                 <div class="profile-preview mb-4">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="avatar-preview" id="avatarPreview">U</div>
+                                        <div class="avatar-preview" id="avatarPreview"
+                                             th:text="${borrower.fullName != null and !#strings.isEmpty(borrower.fullName) ? #strings.substring(borrower.fullName, 0, 1).toUpperCase() : 'U'}">
+                                            U
+                                        </div>
                                         <div>
-                                            <div class="fw-bold fs-5" id="namePreview">Chưa nhập họ tên</div>
-                                            <div class="text-muted" id="cardPreview">Chưa có mã thẻ</div>
+                                            <div class="fw-bold fs-5" id="namePreview"
+                                                 th:text="${borrower.fullName ?: 'Chưa có họ tên'}">
+                                                Chưa có họ tên
+                                            </div>
+                                            <div class="text-muted" id="cardPreview"
+                                                 th:text="${borrower.cardNumber ?: 'Chưa có mã thẻ'}">
+                                                Chưa có mã thẻ
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="info-box mb-3">
                                     <div class="info-box-label">Email</div>
-                                    <div id="emailPreview">---</div>
+                                    <div id="emailPreview" th:text="${borrower.email ?: '---'}">---</div>
                                 </div>
 
                                 <div class="info-box mb-3">
                                     <div class="info-box-label">Số điện thoại</div>
-                                    <div id="phonePreview">---</div>
+                                    <div id="phonePreview" th:text="${borrower.phone ?: '---'}">---</div>
+                                </div>
+
+                                <div class="info-box mb-3">
+                                    <div class="info-box-label">Hạng thành viên</div>
+                                    <div id="levelPreview">---</div>
                                 </div>
 
                                 <div class="info-box">
-                                    <div class="info-box-label">Hạng thành viên hiện chọn</div>
-                                    <div id="levelPreview">Đồng</div>
+                                    <div class="info-box-label">Trạng thái kích hoạt</div>
+                                    <div th:text="${borrower.active ? 'Đang dùng' : 'Ngưng dùng'}">---</div>
                                 </div>
                             </div>
                         </div>
@@ -424,8 +459,7 @@
             maxBorrowLimitPreview.value = 7;
             levelPreview.textContent = 'Vàng';
         } else {
-            maxBorrowLimitPreview.value = 3;
-            levelPreview.textContent = 'Đồng';
+            levelPreview.textContent = '---';
         }
     }
 
@@ -436,7 +470,7 @@
         const phone = phoneInput && phoneInput.value ? phoneInput.value.trim() : '';
 
         avatarPreview.textContent = fullName ? fullName.substring(0, 1).toUpperCase() : 'U';
-        namePreview.textContent = fullName || 'Chưa nhập họ tên';
+        namePreview.textContent = fullName || 'Chưa có họ tên';
         cardPreview.textContent = cardNumber || 'Chưa có mã thẻ';
         emailPreview.textContent = email || '---';
         phonePreview.textContent = phone || '---';

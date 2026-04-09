@@ -272,9 +272,9 @@
             gap: 6px;
         }
 
-        .status-borrowing {
-            background: #dbeafe;
-            color: #1d4ed8;
+        .status-borrowed {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
         .status-returned {
@@ -282,9 +282,9 @@
             color: #166534;
         }
 
-        .status-late {
-            background: #fee2e2;
-            color: #991b1b;
+        .status-other {
+            background: #fff7ed;
+            color: #9a3412;
         }
 
         .action-group {
@@ -391,7 +391,7 @@
                         <div>
                             <div class="section-subtitle">Đang mượn</div>
                             <div class="fs-3 fw-bold mt-1 text-primary"
-                                 th:text="${borrowRecords != null ? #lists.size(borrowRecords.?[status != null and status.name() == 'BORROWING']) : 0}">
+                                 th:text="${borrowRecords != null ? #lists.size(borrowRecords.?[status != null and status.name() == 'BORROWED']) : 0}">
                                 0
                             </div>
                             <div class="section-subtitle mt-1">Chưa hoàn tất trả sách</div>
@@ -407,12 +407,12 @@
                 <div class="stat-card">
                     <div class="d-flex align-items-center justify-content-between">
                         <div>
-                            <div class="section-subtitle">Trả trễ / khác</div>
+                            <div class="section-subtitle">Đã trả / khác</div>
                             <div class="fs-3 fw-bold mt-1 text-danger"
-                                 th:text="${borrowRecords != null ? #lists.size(borrowRecords.?[status != null and status.name() != 'BORROWING' and status.name() != 'RETURNED']) : 0}">
+                                 th:text="${borrowRecords != null ? #lists.size(borrowRecords.?[status != null and status.name() != 'BORROWED']) : 0}">
                                 0
                             </div>
-                            <div class="section-subtitle mt-1">Cần theo dõi thêm</div>
+                            <div class="section-subtitle mt-1">Đã hoàn tất hoặc cần theo dõi thêm</div>
                         </div>
                         <div class="stat-icon danger">
                             <i class="bi bi-exclamation-triangle"></i>
@@ -512,10 +512,10 @@
 
                                 <td>
                                     <span class="status-pill"
-                                          th:classappend="${b.status.name() == 'BORROWING'} ? ' status-borrowing' :
-                                                          (${b.status.name() == 'RETURNED'} ? ' status-returned' : ' status-late')">
+                                          th:classappend="${b.status.name() == 'BORROWED'} ? ' status-borrowed' :
+                                                          (${b.status.name() == 'RETURNED'} ? ' status-returned' : ' status-other')">
                                         <i class="bi bi-circle-fill"></i>
-                                        <span th:text="${b.status}">BORROWING</span>
+                                        <span th:text="${b.status}">BORROWED</span>
                                     </span>
                                 </td>
 

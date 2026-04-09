@@ -1,5 +1,8 @@
 package com.example.libmanagement.entity;
 
+import com.example.libmanagement.enums.BookCondition;
+import com.example.libmanagement.enums.FineReason;
+import com.example.libmanagement.enums.PaymentStatus;
 import com.example.libmanagement.enums.ReturnStatus;
 import jakarta.persistence.*;
 
@@ -17,8 +20,8 @@ public class ReturnRecord {
     @Column(name = "return_code", nullable = false, unique = true, length = 30)
     private String returnCode;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "borrow_record_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "borrow_record_id", nullable = false)
     private BorrowRecord borrowRecord;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,11 +32,26 @@ public class ReturnRecord {
     private LocalDate returnDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "status", nullable = false, length = 20)
     private ReturnStatus status;
 
-    @Column(name = "fine_amount", precision = 12, scale = 2)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "book_condition", nullable = false, length = 30)
+    private BookCondition bookCondition = BookCondition.INTACT;
+
+    @Column(name = "overdue_days", nullable = false)
+    private Integer overdueDays = 0;
+
+    @Column(name = "fine_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal fineAmount = BigDecimal.ZERO;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "fine_reason", nullable = false, length = 30)
+    private FineReason fineReason = FineReason.NONE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false, length = 20)
+    private PaymentStatus paymentStatus = PaymentStatus.PAID;
 
     @Column(length = 255)
     private String note;
@@ -41,32 +59,34 @@ public class ReturnRecord {
     public ReturnRecord() {
     }
 
-    public ReturnRecord(String returnCode, BorrowRecord borrowRecord, Employee employee,
-                        LocalDate returnDate, ReturnStatus status, BigDecimal fineAmount, String note) {
-        this.returnCode = returnCode;
-        this.borrowRecord = borrowRecord;
-        this.employee = employee;
-        this.returnDate = returnDate;
-        this.status = status;
-        this.fineAmount = fineAmount;
-        this.note = note;
-    }
-
     @PrePersist
     public void prePersist() {
         if (returnDate == null) {
             returnDate = LocalDate.now();
         }
+        if (bookCondition == null) {
+            bookCondition = BookCondition.INTACT;
+        }
+        if (overdueDays == null) {
+            overdueDays = 0;
+        }
         if (fineAmount == null) {
             fineAmount = BigDecimal.ZERO;
         }
-        if (status == null) {
-            status = ReturnStatus.RETURNED;
+        if (fineReason == null) {
+            fineReason = FineReason.NONE;
+        }
+        if (paymentStatus == null) {
+            paymentStatus = PaymentStatus.PAID;
         }
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getReturnCode() {
@@ -109,12 +129,44 @@ public class ReturnRecord {
         this.status = status;
     }
 
+    public BookCondition getBookCondition() {
+        return bookCondition;
+    }
+
+    public void setBookCondition(BookCondition bookCondition) {
+        this.bookCondition = bookCondition;
+    }
+
+    public Integer getOverdueDays() {
+        return overdueDays;
+    }
+
+    public void setOverdueDays(Integer overdueDays) {
+        this.overdueDays = overdueDays;
+    }
+
     public BigDecimal getFineAmount() {
         return fineAmount;
     }
 
     public void setFineAmount(BigDecimal fineAmount) {
         this.fineAmount = fineAmount;
+    }
+
+    public FineReason getFineReason() {
+        return fineReason;
+    }
+
+    public void setFineReason(FineReason fineReason) {
+        this.fineReason = fineReason;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public String getNote() {

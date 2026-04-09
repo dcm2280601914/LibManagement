@@ -6,6 +6,7 @@ import com.example.libmanagement.service.EmployeeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 
@@ -68,6 +69,19 @@ public class EmployeeController {
     @GetMapping("/delete/{id}")
     public String deleteEmployee(@PathVariable Long id) {
         employeeService.delete(id);
+        return "redirect:/employees";
+    }
+
+    @PostMapping("/{id}/reset-password")
+    public String resetPassword(@PathVariable Long id,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            employeeService.resetPassword(id);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đã reset mật khẩu về mặc định: 123456");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
         return "redirect:/employees";
     }
 }

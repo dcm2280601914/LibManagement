@@ -1,93 +1,134 @@
 package com.example.libmanagement.controller;
 
+import com.example.libmanagement.entity.BorrowRecord;
 import com.example.libmanagement.entity.ReturnRecord;
+import com.example.libmanagement.enums.BookCondition;
+import com.example.libmanagement.enums.BorrowStatus;
+import com.example.libmanagement.enums.FineReason;
+import com.example.libmanagement.enums.PaymentStatus;
 import com.example.libmanagement.enums.ReturnStatus;
-import com.example.libmanagement.service.BorrowRecordService;
-import com.example.libmanagement.service.EmployeeService;
+import com.example.libmanagement.repository.BorrowRecordRepository;
 import com.example.libmanagement.service.ReturnRecordService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/return-records")
 public class ReturnRecordController {
 
     private final ReturnRecordService returnRecordService;
-    private final BorrowRecordService borrowRecordService;
-    private final EmployeeService employeeService;
+    private final BorrowRecordRepository borrowRecordRepository;
 
     public ReturnRecordController(ReturnRecordService returnRecordService,
-                                  BorrowRecordService borrowRecordService,
-                                  EmployeeService employeeService) {
+                                  BorrowRecordRepository borrowRecordRepository) {
         this.returnRecordService = returnRecordService;
-        this.borrowRecordService = borrowRecordService;
-        this.employeeService = employeeService;
+        this.borrowRecordRepository = borrowRecordRepository;
     }
 
     @GetMapping
-    public String listReturnRecords(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
-        List<ReturnRecord> returnRecords;
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            returnRecords = returnRecordService.searchByBorrowerName(keyword);
-        } else {
-            returnRecords = returnRecordService.findAll();
-        }
-        model.addAttribute("returnRecords", returnRecords);
+    public String list(@RequestParam(value = "keyword", required = false) String keyword,
+                       Model model) {
         model.addAttribute("keyword", keyword);
+        model.addAttribute("returnRecords", returnRecordService.searchByBorrowerName(keyword));
         return "return-records/list";
     }
 
     @GetMapping("/add")
     public String showAddForm(Model model) {
-        model.addAttribute("returnRecord", new ReturnRecord());
-        model.addAttribute("borrowRecords", borrowRecordService.findAll());
-        model.addAttribute("employees", employeeService.findAll());
-        model.addAttribute("statuses", Arrays.asList(ReturnStatus.values()));
+        ReturnRecord returnRecord = new ReturnRecord();
+        returnRecord.setBorrowRecord(new BorrowRecord());
+        returnRecord.setBookCondition(BookCondition.INTACT);
+
+        model.addAttribute("returnRecord", returnRecord);
+        model.addAttribute("borrowRecords",
+                borrowRecordRepository.findByStatusOrderByBorrowDateDesc(BorrowStatus.BORROWED));
+        model.addAttribute("bookConditions", BookCondition.values());
+
         return "return-records/add";
     }
 
-    @PostMapping("/save")
-    public String saveReturnRecord(@ModelAttribute("returnRecord") ReturnRecord returnRecord) {
-        returnRecordService.save(returnRecord);
+    @PostMapping("/add")
+    public String add(@ModelAttribute("returnRecord") ReturnRecord returnRecord,
+                      Model model) {
+        try {
+            returnRecordService.save(returnRecord);
+            return "redirect:/return-records";
+        } catch (Exception e) {
+            if (returnRecord.getBorrowRecord() == null) {
+                returnRecord.setBorrowRecord(new BorrowRecord());
+            }
+
+            model.addAttribute("returnRecord", returnRecord);
+            model.addAttribute("borrowRecords",
+                    borrowRecordRepository.findByStatusOrderByBorrowDateDesc(BorrowStatus.BORROWED));
+            model.addAttribute("bookConditions", BookCondition.values());
+            model.addAttribute("errorMessage", e.getMessage());
+
+            return "return-records/add";
+        }
+    }
+
+    @PostMapping("/quick-confirm")
+    public String quickConfirm(@RequestParam("borrowCode") String borrowCode,
+                               @RequestParam(value = "bookCondition", defaultValue = "INTACT") BookCondition bookCondition,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            BorrowRecord borrowRecord = borrowRecordRepository.findByBorrowCode(borrowCode.trim())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy phiếu mượn với mã: " + borrowCode));
+
+            ReturnRecord returnRecord = new ReturnRecord();
+            returnRecord.setBorrowRecord(borrowRecord);
+            returnRecord.setReturnDate(LocalDate.now());
+            returnRecord.setBookCondition(bookCondition);
+
+            ReturnRecord saved = returnRecordService.save(returnRecord);
+
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Xác nhận trả nhanh thành công. Mã phiếu trả: " + saved.getReturnCode());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
         return "redirect:/return-records";
+    }
+
+    @GetMapping("/{id}/receipt")
+    public String printReceipt(@PathVariable Long id, Model model) {
+        model.addAttribute("returnRecord", returnRecordService.findById(id));
+        return "return-records/receipt";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        ReturnRecord returnRecord = returnRecordService.findById(id);
-        if (returnRecord == null) {
-            return "redirect:/return-records";
-        }
-        model.addAttribute("returnRecord", returnRecord);
-        model.addAttribute("borrowRecords", borrowRecordService.findAll());
-        model.addAttribute("employees", employeeService.findAll());
-        model.addAttribute("statuses", Arrays.asList(ReturnStatus.values()));
+        model.addAttribute("returnRecord", returnRecordService.findById(id));
+        model.addAttribute("returnStatuses", ReturnStatus.values());
+        model.addAttribute("fineReasons", FineReason.values());
+        model.addAttribute("paymentStatuses", PaymentStatus.values());
+        model.addAttribute("bookConditions", BookCondition.values());
+
         return "return-records/edit";
     }
 
-    @PostMapping("/update/{id}")
-    public String updateReturnRecord(@PathVariable Long id, @ModelAttribute("returnRecord") ReturnRecord returnRecord) {
-        returnRecordService.update(id, returnRecord);
-        return "redirect:/return-records";
-    }
-
-    @GetMapping("/detail/{id}")
-    public String viewDetail(@PathVariable Long id, Model model) {
-        ReturnRecord returnRecord = returnRecordService.findById(id);
-        if (returnRecord == null) {
+    @PostMapping("/edit/{id}")
+    public String update(@PathVariable Long id,
+                         @ModelAttribute("returnRecord") ReturnRecord returnRecord,
+                         Model model) {
+        try {
+            returnRecordService.update(id, returnRecord);
             return "redirect:/return-records";
-        }
-        model.addAttribute("returnRecord", returnRecord);
-        return "return-records/detail";
-    }
+        } catch (Exception e) {
+            model.addAttribute("returnRecord", returnRecord);
+            model.addAttribute("returnStatuses", ReturnStatus.values());
+            model.addAttribute("fineReasons", FineReason.values());
+            model.addAttribute("paymentStatuses", PaymentStatus.values());
+            model.addAttribute("bookConditions", BookCondition.values());
+            model.addAttribute("errorMessage", e.getMessage());
 
-    @GetMapping("/delete/{id}")
-    public String deleteReturnRecord(@PathVariable Long id) {
-        returnRecordService.delete(id);
-        return "redirect:/return-records";
+            return "return-records/edit";
+        }
     }
 }

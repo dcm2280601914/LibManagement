@@ -35,6 +35,15 @@ public class Employee {
     @Column(nullable = false)
     private Boolean active = true;
 
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    @Column(name = "last_seen")
+    private LocalDateTime lastSeen;
+
+    @Column(name = "online", nullable = false)
+    private Boolean online = false;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -42,7 +51,8 @@ public class Employee {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Employee(String fullName, String username, String passwordHash, String email, String phone, Role role, Boolean active) {
+    public Employee(String fullName, String username, String passwordHash, String email,
+                    String phone, Role role, Boolean active) {
         this.fullName = fullName;
         this.username = username;
         this.passwordHash = passwordHash;
@@ -50,14 +60,22 @@ public class Employee {
         this.phone = phone;
         this.role = role;
         this.active = active;
+        this.online = false;
         this.createdAt = LocalDateTime.now();
+    }
+
+    @Transient
+    public boolean isCurrentlyOnline() {
+        if (lastSeen == null) {
+            return false;
+        }
+        return lastSeen.isAfter(LocalDateTime.now().minusMinutes(5));
     }
 
     public Long getId() {
         return id;
     }
 
-    // THÊM DÒNG NÀY
     public void setId(Long id) {
         this.id = id;
     }
@@ -116,6 +134,30 @@ public class Employee {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public LocalDateTime getLastLoginAt() {
+        return lastLoginAt;
+    }
+
+    public void setLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
+    public LocalDateTime getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setLastSeen(LocalDateTime lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
+    public Boolean getOnline() {
+        return online;
+    }
+
+    public void setOnline(Boolean online) {
+        this.online = online;
     }
 
     public LocalDateTime getCreatedAt() {

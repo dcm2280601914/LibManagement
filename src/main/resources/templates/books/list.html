@@ -427,7 +427,6 @@
 <body>
 <div class="container-fluid page-container">
 
-    <!-- Hero -->
     <div class="card hero-card mb-4">
         <div class="card-body p-4 p-lg-5">
             <div class="row align-items-center g-4 hero-content">
@@ -469,7 +468,6 @@
         </div>
     </div>
 
-    <!-- Stats -->
     <div class="row g-3 stats-grid mb-4">
         <div class="col-12 col-md-6 col-xl-3">
             <div class="stat-card">
@@ -504,7 +502,6 @@
         </div>
     </div>
 
-    <!-- Main Panel -->
     <div class="panel-card">
         <div class="panel-header">
             <h2 class="section-title">Danh sách sách</h2>
@@ -513,7 +510,6 @@
 
         <div class="panel-body">
 
-            <!-- Filter -->
             <div class="filter-box mb-4">
                 <form th:action="@{/books}" method="get" class="row g-3">
                     <div class="col-12 col-md-6 col-xl-3">
@@ -587,7 +583,6 @@
                 </form>
             </div>
 
-            <!-- Table -->
             <div class="table-wrap">
                 <div class="table-responsive">
                     <table class="table align-middle">
@@ -714,7 +709,6 @@
                 </div>
             </div>
 
-            <!-- Footer / Pagination -->
             <div class="table-footer" th:if="${bookPage != null}">
                 <div class="footer-info">
                     Tổng số sách:

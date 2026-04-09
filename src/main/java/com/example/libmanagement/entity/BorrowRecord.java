@@ -75,6 +75,10 @@ public class BorrowRecord {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getBorrowCode() {
         return borrowCode;
     }
