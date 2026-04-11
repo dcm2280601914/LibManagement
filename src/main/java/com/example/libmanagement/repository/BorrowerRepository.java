@@ -4,6 +4,7 @@ import com.example.libmanagement.entity.Borrower;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 public interface BorrowerRepository extends JpaRepository<Borrower, Long>, JpaSpecificationExecutor<Borrower> {
@@ -21,4 +22,6 @@ public interface BorrowerRepository extends JpaRepository<Borrower, Long>, JpaSp
     boolean existsByQrCodeAndIdNot(String qrCode, Long id);
 
     Optional<Borrower> findByQrCode(String qrCode);
+
+    long countByCreatedDateBetween(LocalDate startDate, LocalDate endDate);
 }

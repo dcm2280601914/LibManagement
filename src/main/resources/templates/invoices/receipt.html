@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Biên lai hóa đơn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #ffffff;
+        }
+        .receipt {
+            max-width: 700px;
+            margin: auto;
+            border: 1px solid #d1d5db;
+            padding: 24px;
+            border-radius: 10px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .row {
+            margin-bottom: 12px;
+        }
+        .label {
+            display: inline-block;
+            width: 180px;
+            font-weight: bold;
+        }
+        .actions {
+            margin-top: 24px;
+            text-align: center;
+        }
+        .actions a, .actions button {
+            display: inline-block;
+            margin: 0 8px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            background: #2563eb;
+        }
+        .actions button {
+            background: #16a34a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="receipt">
+    <h1>Biên lai thanh toán hóa đơn</h1>
+
+    <div class="row">
+        <span class="label">Mã hóa đơn:</span>
+        <span th:text="${invoice.invoiceCode}">INV-001</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Mã phiếu trả:</span>
+        <span th:text="${invoice.returnRecord != null ? invoice.returnRecord.returnCode : ''}">TRA-001</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Người mượn:</span>
+        <span th:text="${invoice.borrower != null ? invoice.borrower.fullName : ''}">Nguyễn Văn A</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Số tiền hóa đơn:</span>
+        <span th:text="${invoice.amount}">5000</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Số tiền đã thanh toán:</span>
+        <span th:text="${invoice.paidAmount}">5000</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Trạng thái:</span>
+        <span th:text="${invoice.status}">PAID</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Phương thức thanh toán:</span>
+        <span th:text="${invoice.paymentMethod != null ? invoice.paymentMethod : '---'}">CASH</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Ngày tạo hóa đơn:</span>
+        <span th:text="${invoice.invoiceDate}">2026-04-08</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Thời gian thanh toán:</span>
+        <span th:text="${invoice.paidAt != null ? invoice.paidAt : '---'}">---</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Ghi chú:</span>
+        <span th:text="${invoice.note != null ? invoice.note : '---'}">---</span>
+    </div>
+
+    <div class="actions">
+        <a th:href="@{/invoices/{id}(id=${invoice.id})}">Quay lại chi tiết</a>
+        <button onclick="window.print()">In biên lai</button>
+    </div>
+</div>
+
+</body>
+</html>

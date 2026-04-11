@@ -619,6 +619,11 @@
 
                                 <td class="text-nowrap">
                                     <div class="action-group">
+                                        <a th:if="${item.invoice != null}"
+                                           th:href="@{/invoices/{id}(id=${item.invoice.id})}"
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-receipt-cutoff me-1"></i> Xem hóa đơn
+                                        </a>
                                         <a th:href="@{'/return-records/edit/' + ${item.id}}" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-pencil-square me-1"></i> Sửa
                                         </a>

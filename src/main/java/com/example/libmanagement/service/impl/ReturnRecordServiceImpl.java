@@ -103,7 +103,7 @@ public class ReturnRecordServiceImpl implements ReturnRecordService {
 
         Employee employee = formData.getEmployee();
         if (employee == null || employee.getId() == null) {
-            throw new RuntimeException("Vui lòng chọn nhân viên xử lý.");
+            throw new RuntimeException("Không xác định được nhân viên đăng nhập.");
         }
 
         Book book = borrowRecord.getBook();

@@ -2,6 +2,7 @@ package com.example.libmanagement.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "books")
@@ -42,6 +43,9 @@ public class Book {
     @Column(name = "import_date")
     private LocalDate importDate;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
     @Column(name = "total_quantity", nullable = false)
     private Integer totalQuantity = 0;
 
@@ -52,6 +56,22 @@ public class Book {
     private String description;
 
     public Book() {
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (importDate == null) {
+            importDate = LocalDate.now();
+        }
+        if (totalQuantity == null) {
+            totalQuantity = 0;
+        }
+        if (availableQuantity == null) {
+            availableQuantity = 0;
+        }
     }
 
     public Book(String title, Category category, String author, String publisher,
@@ -77,7 +97,6 @@ public class Book {
         return id;
     }
 
-    // THÊM METHOD NÀY
     public void setId(Long id) {
         this.id = id;
     }
@@ -160,6 +179,14 @@ public class Book {
 
     public void setImportDate(LocalDate importDate) {
         this.importDate = importDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Integer getTotalQuantity() {

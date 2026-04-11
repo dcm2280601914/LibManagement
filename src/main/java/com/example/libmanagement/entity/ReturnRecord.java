@@ -56,11 +56,23 @@ public class ReturnRecord {
     @Column(length = 255)
     private String note;
 
+    @OneToOne(mappedBy = "returnRecord", fetch = FetchType.LAZY)
+    private Invoice invoice;
+
     public ReturnRecord() {
     }
 
     @PrePersist
     public void prePersist() {
+        applyDefaults();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        applyDefaults();
+    }
+
+    private void applyDefaults() {
         if (returnDate == null) {
             returnDate = LocalDate.now();
         }
@@ -175,5 +187,13 @@ public class ReturnRecord {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 }
