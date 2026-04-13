@@ -122,7 +122,8 @@
         }
 
         .summary-icon,
-        .quick-link-icon {
+        .quick-link-icon,
+        .empty-icon {
             width: 56px;
             height: 56px;
             border-radius: 16px;
@@ -182,12 +183,26 @@
 
         .chart-box {
             position: relative;
-            height: 320px;
+            height: 340px;
         }
 
         .chart-box-lg {
             position: relative;
-            height: 360px;
+            height: 380px;
+        }
+
+        .chart-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .chart-note {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 0;
         }
 
         .table thead th {
@@ -274,7 +289,35 @@
         .empty-state {
             color: var(--text-muted);
             text-align: center;
-            padding: 24px 10px;
+            padding: 32px 12px;
+        }
+
+        .empty-state strong {
+            color: var(--text-main);
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        .badge-soft {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.42rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .badge-category {
+            background: var(--primary-soft);
+            color: #2563eb;
+        }
+
+        .mini-actions .btn {
+            padding: 0.45rem 0.75rem;
+            font-size: 0.86rem;
+            border-radius: 10px;
         }
 
         @media (min-width: 1400px) {
@@ -343,7 +386,8 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <div class="summary-label">Tổng số sách</div>
-                            <div class="summary-value" th:text="${summary != null ? summary.totalBooks : 0}">0</div>
+                            <div class="summary-value text-primary"
+                                 th:text="${summary != null ? #numbers.formatInteger(summary.totalBooks, 0, 'COMMA') : '0'}">0</div>
                             <div class="summary-note">Toàn bộ đầu sách trong kho</div>
                         </div>
                         <div class="summary-icon bg-primary-soft">
@@ -358,7 +402,8 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <div class="summary-label">Đang cho mượn</div>
-                            <div class="summary-value" th:text="${summary != null ? summary.borrowedBooks : 0}">0</div>
+                            <div class="summary-value text-warning"
+                                 th:text="${summary != null ? #numbers.formatInteger(summary.borrowedBooks, 0, 'COMMA') : '0'}">0</div>
                             <div class="summary-note">Phiếu mượn ở trạng thái BORROWED</div>
                         </div>
                         <div class="summary-icon bg-warning-soft">
@@ -373,7 +418,8 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <div class="summary-label">Độc giả mới tháng này</div>
-                            <div class="summary-value" th:text="${summary != null ? summary.newBorrowersThisMonth : 0}">0</div>
+                            <div class="summary-value text-success"
+                                 th:text="${summary != null ? #numbers.formatInteger(summary.newBorrowersThisMonth, 0, 'COMMA') : '0'}">0</div>
                             <div class="summary-note">Số hồ sơ được tạo trong tháng hiện tại</div>
                         </div>
                         <div class="summary-icon bg-success-soft">
@@ -388,11 +434,11 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <div class="summary-label">Tổng tiền phạt đã thu</div>
-                            <div class="summary-value"
-                                 th:text="${summary != null ? #numbers.formatDecimal(summary.totalPaidFines, 0, 'COMMA', 0, 'POINT') : 0}">
-                                0
+                            <div class="summary-value text-danger"
+                                 th:text="${summary != null ? #numbers.formatDecimal(summary.totalPaidFines, 0, 'COMMA', 0, 'POINT') + ' VNĐ' : '0 VNĐ'}">
+                                0 VNĐ
                             </div>
-                            <div class="summary-note">Đơn vị: VNĐ</div>
+                            <div class="summary-note">Tổng các khoản phạt đã thanh toán</div>
                         </div>
                         <div class="summary-icon bg-danger-soft">
                             <i class="bi bi-cash-stack"></i>
@@ -406,9 +452,14 @@
         <div class="row g-3 mb-4">
             <div class="col-lg-5">
                 <div class="chart-card">
-                    <div class="mb-3">
-                        <h2 class="section-title mb-1">Sách theo thể loại</h2>
-                        <div class="section-subtitle">Thống kê số lượng sách theo danh mục</div>
+                    <div class="chart-toolbar">
+                        <div>
+                            <h2 class="section-title mb-1">Sách theo thể loại</h2>
+                            <div class="section-subtitle">Thống kê số lượng sách theo danh mục</div>
+                        </div>
+                        <span class="badge-soft badge-category">
+                            <i class="bi bi-pie-chart-fill"></i> Pie Chart
+                        </span>
                     </div>
                     <div class="chart-box">
                         <canvas id="categoryPieChart"></canvas>
@@ -418,9 +469,14 @@
 
             <div class="col-lg-7">
                 <div class="chart-card">
-                    <div class="mb-3">
-                        <h2 class="section-title mb-1">Xu hướng mượn sách 7 ngày gần nhất</h2>
-                        <div class="section-subtitle">Số lượt mượn được ghi nhận theo từng ngày</div>
+                    <div class="chart-toolbar">
+                        <div>
+                            <h2 class="section-title mb-1">Xu hướng mượn sách 7 ngày gần nhất</h2>
+                            <div class="section-subtitle">Số lượt mượn được ghi nhận theo từng ngày</div>
+                        </div>
+                        <span class="badge-soft badge-category">
+                            <i class="bi bi-graph-up-arrow"></i> Line Chart
+                        </span>
                     </div>
                     <div class="chart-box">
                         <canvas id="borrowTrendChart"></canvas>
@@ -433,9 +489,16 @@
         <div class="row g-3 mb-4">
             <div class="col-lg-6">
                 <div class="table-card">
-                    <div class="mb-3">
-                        <h2 class="section-title mb-1">Phiếu mượn quá hạn</h2>
-                        <div class="section-subtitle">Top 5 phiếu mượn cần được xử lý sớm</div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h2 class="section-title mb-1">Phiếu mượn quá hạn</h2>
+                            <div class="section-subtitle">Top 5 phiếu mượn cần được xử lý sớm</div>
+                        </div>
+                        <div class="mini-actions">
+                            <a th:href="@{/borrow-records}" class="btn btn-outline-danger btn-sm">
+                                Xem tất cả
+                            </a>
+                        </div>
                     </div>
 
                     <div class="table-responsive">
@@ -453,7 +516,11 @@
                             <tr th:if="${#lists.isEmpty(overdueBorrows)}">
                                 <td colspan="5">
                                     <div class="empty-state">
-                                        Không có phiếu mượn quá hạn.
+                                        <div class="empty-icon bg-warning-soft mx-auto">
+                                            <i class="bi bi-check2-circle"></i>
+                                        </div>
+                                        <strong>Không có phiếu mượn quá hạn</strong>
+                                        <span>Hiện tại toàn bộ phiếu mượn vẫn trong thời hạn.</span>
                                     </div>
                                 </td>
                             </tr>
@@ -479,9 +546,16 @@
 
             <div class="col-lg-6">
                 <div class="table-card">
-                    <div class="mb-3">
-                        <h2 class="section-title mb-1">Sách mới nhập</h2>
-                        <div class="section-subtitle">Top 5 đầu sách mới được thêm vào kho</div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h2 class="section-title mb-1">Sách mới nhập</h2>
+                            <div class="section-subtitle">Top 5 đầu sách mới được thêm vào kho</div>
+                        </div>
+                        <div class="mini-actions">
+                            <a th:href="@{/books}" class="btn btn-outline-primary btn-sm">
+                                Xem kho sách
+                            </a>
+                        </div>
                     </div>
 
                     <div class="table-responsive">
@@ -498,7 +572,11 @@
                             <tr th:if="${#lists.isEmpty(newestBooks)}">
                                 <td colspan="4">
                                     <div class="empty-state">
-                                        Chưa có dữ liệu sách mới nhập.
+                                        <div class="empty-icon bg-primary-soft mx-auto">
+                                            <i class="bi bi-journal-plus"></i>
+                                        </div>
+                                        <strong>Chưa có dữ liệu sách mới nhập</strong>
+                                        <span>Dữ liệu sẽ xuất hiện khi có sách được thêm vào hệ thống.</span>
                                     </div>
                                 </td>
                             </tr>
@@ -507,9 +585,12 @@
                                 <td>
                                     <div class="book-title" th:text="${book.title}">Tên sách</div>
                                 </td>
-                                <td th:text="${book.categoryName}">Văn học</td>
-                                <td th:text="${book.author}">Tác giả</td>
-                                <td th:text="${book.importDate}">2026-04-11</td>
+                                <td>
+                                    <span class="badge-soft badge-category"
+                                          th:text="${book.categoryName}">Văn học</span>
+                                </td>
+                                <td th:text="${book.author != null ? book.author : '---'}">Tác giả</td>
+                                <td th:text="${book.importDate != null ? book.importDate : '---'}">2026-04-11</td>
                             </tr>
                             </tbody>
                         </table>
@@ -522,9 +603,14 @@
         <div class="row g-3 mb-4">
             <div class="col-12">
                 <div class="chart-card">
-                    <div class="mb-3">
-                        <h2 class="section-title mb-1">Top 5 sách được mượn nhiều nhất</h2>
-                        <div class="section-subtitle">So sánh số lượt mượn theo từng đầu sách</div>
+                    <div class="chart-toolbar">
+                        <div>
+                            <h2 class="section-title mb-1">Top 5 sách được mượn nhiều nhất</h2>
+                            <div class="section-subtitle">So sánh số lượt mượn theo từng đầu sách</div>
+                        </div>
+                        <span class="badge-soft badge-category">
+                            <i class="bi bi-bar-chart-fill"></i> Bar Chart
+                        </span>
                     </div>
                     <div class="chart-box-lg">
                         <canvas id="topBorrowedBooksChart"></canvas>
@@ -551,6 +637,34 @@
                                 <div>
                                     <div class="quick-link-title">Quản lý sách</div>
                                     <p class="quick-link-desc">Xem, thêm, sửa thông tin đầu sách và tồn kho.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-xl-3">
+                        <a th:href="@{/categories}" class="quick-link-card">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="quick-link-icon bg-info-soft">
+                                    <i class="bi bi-tags-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="quick-link-title">Quản lý thể loại</div>
+                                    <p class="quick-link-desc">Phân loại sách theo danh mục và theo dõi số lượng theo từng thể loại.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-xl-3">
+                        <a th:href="@{/borrowers}" class="quick-link-card">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="quick-link-icon bg-success-soft">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="quick-link-title">Quản lý người mượn</div>
+                                    <p class="quick-link-desc">Theo dõi hồ sơ bạn đọc, trạng thái tài khoản và giới hạn mượn.</p>
                                 </div>
                             </div>
                         </a>
@@ -593,6 +707,34 @@
                                 <div>
                                     <div class="quick-link-title">Hóa đơn</div>
                                     <p class="quick-link-desc">Xem và đối soát các hóa đơn tiền phạt đã phát sinh.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-xl-3">
+                        <a th:href="@{/employees}" class="quick-link-card">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="quick-link-icon bg-danger-soft">
+                                    <i class="bi bi-person-badge-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="quick-link-title">Quản lý nhân viên</div>
+                                    <p class="quick-link-desc">Quản lý tài khoản nhân sự tham gia vận hành thư viện.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6 col-xl-3">
+                        <a th:href="@{/audit-logs}" class="quick-link-card">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="quick-link-icon bg-warning-soft">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                                <div>
+                                    <div class="quick-link-title">Lịch sử hoạt động</div>
+                                    <p class="quick-link-desc">Theo dõi các thao tác tạo, sửa, xóa và đối soát dữ liệu hệ thống.</p>
                                 </div>
                             </div>
                         </a>
@@ -673,8 +815,11 @@
                     datasets: [{
                         label: 'Lượt mượn',
                         data: values,
-                        tension: 0.35,
-                        fill: false
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 5
                     }]
                 },
                 options: {
@@ -714,7 +859,9 @@
                     datasets: [{
                         label: 'Số lượt mượn',
                         data: values,
-                        borderWidth: 1
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        maxBarThickness: 70
                     }]
                 },
                 options: {
@@ -746,6 +893,7 @@
         loadTopBorrowedBooksChart();
     });
 </script>
+
 <div th:replace="fragments/chatbot :: chatbot"></div>
 </body>
 </html>
